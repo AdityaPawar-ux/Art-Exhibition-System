@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Invoice #{{ order['id'] if order and order.id else 'N/A' }}{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Invoice #{{ order['id'] if order and order.id else 'N/A' }} - Purchase Confirmation</h2>
+    {% if order %}
+        <div class="invoice-card">
+            <p><strong>Order Date:</strong> {{ order['purchase_date'] if order.purchase_date else 'N/A' }}</p>
+            <p><strong>Customer:</strong> {{ order['name'] if order.name else 'N/A' }} ({{ order['username'] if order.username else 'N/A' }}) - {{ order['email'] if order.email else 'N/A' }}</p>
+            <p><strong>Delivery Address:</strong> {{ order['address'] if order.address else 'N/A' }}</p>
+            <p><strong>Payment Method:</strong> {{ order['payment_method'] if order.payment_method else 'N/A' }}</p>
+            <hr>
+            <h4>Painting Details:</h4>
+            <p><strong>Title:</strong> {{ order['title'] if order.title else 'N/A' }} ({{ order['type'] if order.type else 'N/A' }}) by {{ order['artist'] if order.artist else 'Unknown' }}</p>
+            <p><strong>Description:</strong> {{ order['description'] if order.description else 'No description' }}</p>
+            <p><strong>Price:</strong> ₹{{ order['price'] if order.price else 0 }}</p>
+            <hr>
+            <p class="total"><strong>Total Amount:</strong> ₹{{ total if total else 0 }}</p>
+            <p class="status">Status: {{ order['status'] if order.status else 'Pending' }} (Will be shipped soon!)</p>
+            <a href="{{ url_for('painting_detail', painting_id=order['painting_id'] if order.painting_id else 0) }}" class="btn btn-secondary">Back to Painting</a>
+            <button onclick="window.print()" class="btn btn-primary">Print/Download Invoice</button>
+        </div>
+    {% else %}
+        <p>No invoice details available.</p>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Home</a>
+    {% endif %}
+</div>
+<style>
+    .invoice-card { background: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #ddd; }
+    .total { font-size: 1.5em; color: #28a745; font-weight: bold; }
+    .status { color: #ffc107; font-weight: bold; }
+</style>
+{% endblock %}

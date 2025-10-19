@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Art Exhibition{% endblock %}</title>  <!-- Title block defined ONCE here -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('about') }}">About</a></li>
+            <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
+            <li><a href="{{ url_for('admin_login') }}">Admin Panel</a></li>
+            <!-- Auth Links (New - Conditional) -->
+            {% if current_user.is_authenticated %}
+                <li><a href="{{ url_for('profile') }}">Profile ({{ current_user.username }})</a></li>
+                <li><a href="{{ url_for('user_logout') }}">Logout</a></li>
+            {% else %}
+                <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p class="flash {{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}  <!-- Content block for pages to override -->
+    </main>
+</body>
+</html>

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Home - Art Exhibition{% endblock %}
+{% block content %}
+<!-- Main Content -->
+<div class="container">
+    {% if user_message %}
+        <div class="alert alert-success text-center mb-4">{{ user_message }}</div>  <!-- Welcome message -->
+    {% endif %}
+    
+    <h1>Welcome to Our Art Exhibition</h1>
+    <p>Discover beautiful paintings from talented artists.</p>
+    
+    <!-- Public Gallery (All Paintings) -->
+    <h3>Featured Paintings</h3>
+    <div class="gallery">
+        {% if paintings %}
+            {% for painting in paintings %}
+                <a href="{{ url_for('painting_detail', painting_id=painting.id) }}" class="painting-link">  <!-- Clickable link to detail -->
+                    <div class="painting-card">
+                        <img src="{{ painting.image_path }}" alt="{{ painting.title }}">
+                        <div class="card-content">
+                            <h3>{{ painting.title }}</h3>
+                            <p><strong>Type:</strong> {{ painting.type }}</p>
+                            <p><strong>Artist:</strong> {{ painting.artist }}</p>
+                            <p>{{ painting.description[:50] }}...</p>
+                            <p><strong>Price:</strong> ₹{{ painting.price }}</p>  <!-- NEW: Price display -->
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        {% else %}
+            <p>No paintings available. <a href="{{ url_for('admin_login') }}">Login to admin to add some!</a></p>
+        {% endif %}
+    </div>
+    
+    <!-- User's Personal Paintings (If logged in) -->
+    {% if is_logged_in %}
+        <h3 class="mt-5">Your Paintings, {{ current_user.username }}!</h3>
+        <div class="gallery">
+            {% if user_paintings %}
+                {% for painting in user_paintings %}
+                    <a href="{{ url_for('painting_detail', painting_id=painting.id) }}" class="painting-link">  <!-- Clickable -->
+                        <div class="painting-card">
+                            <img src="{{ painting.image_path }}" alt="{{ painting.title }}">
+                            <div class="card-content">
+                                <h3>{{ painting.title }}</h3>
+                                <p><strong>Type:</strong> {{ painting.type }}</p>
+                                <p>{{ painting.description[:50] }}...</p>
+                                <p><strong>Price:</strong> ${{ painting.price }}</p>  <!-- NEW: Price -->
+                                <a href="{{ url_for('my_paintings') }}" class="btn btn-sm btn-info">View All My Paintings</a>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info">No personal paintings yet. Admin can add some for you!</div>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

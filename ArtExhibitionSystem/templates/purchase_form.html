@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Purchase Form - {{ painting['title'] if painting and painting.title else 'Painting' }}{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Purchase "{{ painting['title'] if painting and painting.title else 'Unknown Painting' }}" (₹{{ painting['price'] if painting and painting.price else 0 }})</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="name" class="form-label">Full Name:</label>
+            <input type="text" name="name" id="name" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="address" class="form-label">Delivery Address:</label>
+            <textarea name="address" id="address" class="form-control" rows="3" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="payment_method" class="form-label">Payment Method:</label>
+            <select name="payment_method" id="payment_method" class="form-select" required>
+                <option value="">Select</option>
+                <option value="COD">Cash on Delivery (COD)</option>
+                <option value="GPay">Google Pay (GPay)</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-success">Confirm Purchase</button>
+        <a href="{{ url_for('painting_detail', painting_id=painting['id'] if painting and painting.id else 0) }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

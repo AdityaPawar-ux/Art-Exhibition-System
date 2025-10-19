@@ -1,0 +1,28 @@
+Frameworks to Install (via pip)
+
+pip install flask flask-login mysql-connector-python werkzeug
+
+Setup & Run Steps (One-Liner Each)
+
+Download project zip > Extract to folder (e.g., C:\ArtExhibition).
+
+Install Python 3.10+ from python.org > Add to PATH during install.
+
+Open CMD > cd to project folder > Run pip install flask flask-login mysql-connector-python werkzeug.
+
+Download XAMPP from apachefriends.org > Install > Start Apache & MySQL in Control Panel.
+
+Open localhost/phpmyadmin > Create DB "artexhibition" > Run SQL code from README/config to create tables.
+
+Update config.py (DB details: host='localhost', user='root', password='', db='artexhibition').
+
+CMD in project folder > Run python app.py > Open http://localhost:5000.
+
+Test: Signup user > Admin login (admin/admin123) > Add paintings > User purchase > Check orders/reports.
+
+Admin Login 
+username - admin
+password - admin123
+
+
+

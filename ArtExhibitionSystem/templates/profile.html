@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Profile - Art Exhibition{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Welcome, {{ user.username }}!</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5>User Details</h5>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Artist Name:</strong> {{ user.artist_name or 'Not set' }}</p>
+        </div>
+    </div>
+    <div class="mt-3">
+        <a href="{{ url_for('user_logout') }}" class="btn btn-secondary">Logout</a>
+        <a href="{{ url_for('index') }}" class="btn btn-primary">Back to Home</a>
+    </div>
+</div>
+{% endblock %}

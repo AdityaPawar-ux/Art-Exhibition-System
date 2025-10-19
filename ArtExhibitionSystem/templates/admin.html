@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Art Exhibition</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    
+    {% if not is_admin %}
+        <!-- Login Form -->
+        <div class="login-container">
+            <h2>Admin Login</h2>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <p class="flash">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <form method="POST">
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    {% else %}
+        <!-- Admin Dashboard with Vertical Sidebar -->
+        <div class="admin-dashboard">
+            <!-- Sidebar -->
+            <nav class="admin-sidebar">
+                <h2>Admin Menu</h2>
+                <ul>
+                    <li><a href="{{ url_for('admin_paintings') }}" class="{% if active_tab == 'paintings' %}active{% endif %}">Paintings</a></li>
+                    <li><a href="{{ url_for('admin_orders') }}" class="{% if active_tab == 'orders' %}active{% endif %}">Orders</a></li>
+                    <li><a href="{{ url_for('admin_reports') }}" class="{% if active_tab == 'reports' %}active{% endif %}">Reports</a></li>
+                    <li><a href="{{ url_for('admin_contacts') }}" class="{% if active_tab == 'contacts' %}active{% endif %}">Contact Us Details</a></li>
+                    <li><a href="{{ url_for('admin_about') }}" class="{% if active_tab == 'about' %}active{% endif %}">Edit About</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                </ul>
+            </nav>
+            
+            <!-- Content -->
+            <main class="admin-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <p class="flash {{ category }}">{{ message }}</p>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                {% if active_tab == 'paintings' %}
+                    <!-- Add Painting Form (With Dropdown Type) -->
+                    <h2>Add New Painting</h2>
+                    <form method="POST" action="{{ url_for('add_painting') }}">
+                        <input type="text" name="title" placeholder="Title" required class="form-control mb-2">
+                        <label for="type">Type:</label>
+                        <select name="type" id="type" required class="form-control mb-2">
+                            <option value="">Select Type</option>
+                            <option value="Oil">Oil</option>
+                            <option value="Abstract">Abstract</option>
+                            <option value="Watercolor">Watercolor</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" name="artist" placeholder="Artist" required class="form-control mb-2">
+                        <textarea name="description" placeholder="Description" required class="form-control mb-2"></textarea>
+                        <input type="number" name="price" placeholder="Price (e.g., 500.00)" step="0.01" required class="form-control mb-2">
+                        <input type="text" name="image_path" placeholder="Image Path (e.g., /static/images/painting1.jpg)" required class="form-control mb-2">
+                        <button type="submit">Add Painting</button>
+                    </form>
+                    
+                    <!-- Paintings List with Edit/Delete -->
+                    <h3>Existing Paintings</h3>
+                    {% if paintings %}
+                        {% for painting in paintings %}
+                            <div class="painting-item">
+                                <h4>{{ painting.title }} by {{ painting.artist }} ({{ painting.type }})</h4>
+                                <p>{{ painting.description }}</p>
+                                <img src="{{ painting.image_path }}" alt="{{ painting.title }}" style="max-width: 200px;">
+                                <p><strong>Price:</strong> ₹{{ painting.price }}</p>
+                                <div class="admin-actions">
+                                    <a href="{{ url_for('edit_painting', painting_id=painting.id) }}" class="edit-btn">Edit</a>
+                                    <a href="{{ url_for('delete_painting', painting_id=painting.id) }}" class="delete-btn" onclick="return confirm('Delete?')">Delete</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No paintings yet. Add one above!</p>
+                    {% endif %}
+                
+                {% elif active_tab == 'edit_painting' %}
+                    <!-- Edit Painting Form (With Dropdown Type) -->
+                    <h2>Edit Painting: {{ painting.title }}</h2>
+                    <form method="POST">
+                        <input type="text" name="title" value="{{ painting.title }}" required class="form-control mb-2">
+                        <label for="type">Type:</label>
+                        <select name="type" id="type" required class="form-control mb-2">
+                            <option value="">Select Type</option>
+                            <option value="Oil" {% if painting.type == 'Oil' %}selected{% endif %}>Oil</option>
+                            <option value="Abstract" {% if painting.type == 'Abstract' %}selected{% endif %}>Abstract</option>
+                            <option value="Watercolor" {% if painting.type == 'Watercolor' %}selected{% endif %}>Watercolor</option>
+                            <option value="Other" {% if painting.type == 'Other' %}selected{% endif %}>Other</option>
+                        </select>
+                        <input type="text" name="artist" value="{{ painting.artist }}" required class="form-control mb-2">
+                        <textarea name="description" required class="form-control mb-2">{{ painting.description }}</textarea>
+                        <input type="number" name="price" value="{{ painting.price }}" step="0.01" required class="form-control mb-2">
+                        <input type="text" name="image_path" value="{{ painting.image_path }}" required class="form-control mb-2">
+                        {% if painting.image_path %}
+                            <div class="image-preview">
+                                <h4>Current Image:</h4>
+                                <img src="{{ painting.image_path }}" alt="{{ painting.title }}" style="max-width: 300px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                <p><small>Update path below if changing image.</small></p>
+                            </div>
+                        {% endif %}
+                        <button type="submit">Update Painting</button>
+                        <a href="{{ url_for('admin_paintings') }}">Cancel</a>
+                    </form>
+                
+                {% elif active_tab == 'orders' %}
+                    <!-- Orders List with Manage/Edit/Delete (Updated: New Fields) -->
+                    <h2>Manage Orders</h2>
+                    {% if orders %}
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>User</th>
+                                    <th>Painting</th>
+                                    <th>Price</th>
+                                    <th>Name</th>  <!-- NEW -->
+                                    <th>Address</th>  <!-- NEW -->
+                                    <th>Payment</th>  <!-- NEW -->
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                    <tr>
+                                        <td>{{ order.id }}</td>
+                                        <td>{{ order.username }}</td>
+                                        <td>{{ order.title }}</td>
+                                        <td>₹{{ order.price }}</td>
+                                        <td>{{ order.name or 'N/A' }}</td>  <!-- NEW -->
+                                        <td>{{ order.address or 'N/A' }}</td>  <!-- NEW -->
+                                        <td>{{ order.payment_method or 'N/A' }}</td>  <!-- NEW -->
+                                        <td><span class="status-badge status-{{ order.status | lower }}">{{ order.status }}</span></td>
+                                        <td>{{ order.purchase_date }}</td>
+                                        <td>
+                                            <a href="{{ url_for('admin_order_detail', order_id=order.id) }}" class="btn btn-info btn-sm">View</a>
+                                            <a href="{{ url_for('admin_edit_order', order_id=order.id) }}" class="btn btn-warning btn-sm">Edit</a>
+                                            <a href="{{ url_for('admin_delete_order', order_id=order.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Delete this order?')">Delete</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>No orders yet. Users can purchase from gallery!</p>
+                    {% endif %}
+                    <a href="{{ url_for('admin_paintings') }}" class="btn btn-secondary">Back to Paintings</a>
+                
+                {% elif active_tab == 'order_detail' %}
+                    <!-- Order Detail View (Updated: Include New Fields) -->
+                    <h2>Order Details - ID: {{ order.id }}</h2>
+                    <div class="order-detail-card">
+                        <p><strong>User:</strong> {{ order.username }} ({{ order.email }})</p>
+                        <p><strong>Customer Name:</strong> {{ order.name or 'N/A' }}</p>  <!-- NEW -->
+                        <p><strong>Delivery Address:</strong> {{ order.address or 'N/A' }}</p>  <!-- NEW -->
+                        <p><strong>Payment Method:</strong> {{ order.payment_method or 'N/A' }}</p>  <!-- NEW -->
+                        <p><strong>Painting:</strong> {{ order.title }} ({{ order.type }}) by {{ order.artist }}</p>
+                        <p><strong>Description:</strong> {{ order.description }}</p>
+                        <p><strong>Price:</strong> ₹{{ order.price }}</p>
+                        <p><strong>Status:</strong> {{ order.status }}</p>
+                        <p><strong>Purchase Date:</strong> {{ order.purchase_date }}</p>
+                    </div>
+                    <a href="{{ url_for('admin_orders') }}" class="btn btn-secondary">Back to Orders</a>
+                
+                {% elif active_tab == 'edit_order' %}
+                    <!-- Edit Order Form (Status Only - New Fields View-Only) -->
+                    <h2>Edit Order - ID: {{ order.id }}</h2>
+                    <div class="order-detail-card mb-3">
+                        <p><strong>Customer Name:</strong> {{ order.name or 'N/A' }}</p>  <!-- NEW -->
+                        <p><strong>Address:</strong> {{ order.address or 'N/A' }}</p>  <!-- NEW -->
+                        <p><strong>Payment:</strong> {{ order.payment_method or 'N/A' }}</p>  <!-- NEW -->
+                        <p><strong>Painting:</strong> {{ order.title }} (₹{{ order.price }})</p>
+                    </div>
+                    <form method="POST">
+                        <div class="form-group mb-3">
+                            <label for="status">Status:</label>
+                            <select name="status" id="status" required class="form-control">
+                                <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                <option value="Shipped" {% if order.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                                <option value="Cancelled" {% if order.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success">Update Status</button>
+                        <a href="{{ url_for('admin_orders') }}" class="btn btn-secondary">Cancel</a>
+                    </form>
+                
+                {% elif active_tab == 'reports' %}
+                    <!-- Reports Tab Section -->
+                    <h2>Reports & Stats</h2>
+                    <div class="reports-stats">
+                        <div class="stat-card">
+                            <h3>Total Paintings</h3>
+                            <p class="stat-number">{{ total_paintings }}</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Sold Paintings</h3>
+                            <p class="stat-number">{{ total_sold }}</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Stock Available</h3>
+                            <p class="stat-number">{{ stock }}</p>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('admin_paintings') }}" class="btn btn-secondary">Back to Paintings</a>
+                
+                {% elif active_tab == 'contacts' %}
+                    <!-- Contacts List -->
+                    <h2>Contact Messages</h2>
+                    {% if contacts %}
+                        <div class="contacts-list">
+                            {% for contact in contacts %}
+                                <div class="contact-card">
+                                    <h4>{{ contact.name }} ({{ contact.email }})</h4>
+                                    <p><strong>Message:</strong> {{ contact.message }}</p>
+                                    <p><small>{{ contact.created_at }}</small></p>
+                                    <a href="{{ url_for('delete_contact', contact_id=contact.id) }}" class="delete-btn" onclick="return confirm('Delete?')">Delete</a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>No contacts yet.</p>
+                    {% endif %}
+                
+                {% elif active_tab == 'about' %}
+                    <!-- Edit About Form -->
+                    <h2>Edit About Section</h2>
+                    <form method="POST" action="{{ url_for('update_about') }}">
+                        <textarea name="content" rows="10" cols="50" required class="form-control mb-2">{{ about_content.content if about_content else '' }}</textarea>
+                        <button type="submit">Update About</button>
+                    </form>
+                {% endif %}
+            </main>
+        </div>
+    {% endif %}
+    
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

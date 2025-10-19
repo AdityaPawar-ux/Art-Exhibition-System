@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{{ painting['title'] if painting and painting.title else 'Painting' }} - Art Exhibition{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Painting Image (Left Side) -->
+        <div class="col-md-6">
+            <img src="{{ painting['image_path'] if painting and painting.image_path else '/static/images/placeholder.jpg' }}" alt="{{ painting['title'] if painting and painting.title else 'Painting' }}" class="img-fluid rounded border" style="max-height: 500px; object-fit: cover;">
+        </div>
+        
+        <!-- Painting Details (Right Side - White Background Box) -->
+        <div class="col-md-6">
+            <div class="details-box">  <!-- NEW: White Box Wrapper -->
+                <h2>{{ painting['title'] if painting and painting.title else 'Unknown Painting' }}</h2>
+                <p><strong>Type:</strong> {{ painting['type'] if painting and painting.type else 'Not Specified' }}</p>
+                <p><strong>Artist:</strong> {{ painting['artist'] if painting and painting.artist else 'Unknown' }}</p>
+                <p><strong>Description:</strong> {{ painting['description'] if painting and painting.description else 'No description available.' }}</p>
+                <p><strong>Price:</strong> <span class="price">₹{{ painting['price'] if painting and painting.price else 0 }}</span></p>
+                
+                <!-- Purchase Action -->
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('purchase_form', painting_id=painting['id'] if painting and painting.id else 0) }}" class="btn btn-success btn-lg">Purchase Now</a>
+                    <p class="small text-muted">Proceed to checkout with delivery and payment options.</p>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-secondary btn-lg">Login to Purchase</a>
+                    <p class="small text-muted">Create an account to buy this artwork.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Back Link -->
+    <div class="mt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">Back to Gallery</a>
+    </div>
+</div>
+
+<style>
+    /* White Background Box for Details (NEW FIX) */
+    .details-box {
+        background-color: white;  /* White background */
+        padding: 20px;  /* Inner spacing */
+        border-radius: 10px;  /* Rounded corners */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);  /* Light shadow for box effect */
+        height: fit-content;  /* Fit content height */
+    }
+    .price { 
+        font-size: 1.5em; 
+        color: #28a745; 
+        font-weight: bold; 
+    }
+    .img-fluid { 
+        width: 100%; 
+        height: auto; 
+    }
+    /* Responsive: On mobile, full width */
+    @media (max-width: 768px) {
+        .details-box {
+            margin-top: 20px;  /* Space from image on mobile */
+        }
+    }
+</style>
+{% endblock %}
