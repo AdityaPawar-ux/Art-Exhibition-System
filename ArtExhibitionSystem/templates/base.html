@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Art Exhibition{% endblock %}</title>  <!-- Title block defined ONCE here -->
+    <title>{% block title %}Art Exhibition{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -32,7 +32,18 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
-        {% block content %}{% endblock %}  <!-- Content block for pages to override -->
+        {% block content %}{% endblock %}
     </main>
+
+    <!-- Professional Copyright Footer (NEW) -->
+   <footer class="copyright-footer">
+    <div class="footer-content" style="text-align: center;">
+        <p>&copy; 2025 Art Exhibition System. All rights reserved.</p>
+        <p class="small">Project Owner: <strong>Aditya Mahadeo Pawar</strong></p>
+        <p class="small">SMT. Sudhatai Mandke College | Affiliated to Savitribai Phule Pune University</p>
+    </div>
+</footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
